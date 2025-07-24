@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # MongoDB database
+  mongodb:
+    image: mongo:7.0
+    container_name: catchy-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: catchy_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - catchy-network
+
+  # Catchy Backend API
+  api:
+    build: .
+    container_name: catchy-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - DATABASE_NAME=catchy_db
+    depends_on:
+      - mongodb
+    networks:
+      - catchy-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  catchy-network:
+    driver: bridge
