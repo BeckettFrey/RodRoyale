@@ -41,15 +41,34 @@ class UserBase(BaseModel):
     bio: Optional[str] = Field(None, max_length=500)
 
 class UserCreate(UserBase):
-    pass
+    password: str = Field(..., min_length=6, max_length=100, description="User password")
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=50)
     email: Optional[EmailStr] = None
     bio: Optional[str] = Field(None, max_length=500)
+    password: Optional[str] = Field(None, min_length=6, max_length=100)
 
 class User(UserBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    followers: List[PyObjectId] = Field(default_factory=list)
+    following: List[PyObjectId] = Field(default_factory=list)
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
+
+# Public user model (without email for privacy)
+class PublicUser(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    username: str = Field(..., min_length=3, max_length=50)
+    bio: Optional[str] = Field(None, max_length=500)
     followers: List[PyObjectId] = Field(default_factory=list)
     following: List[PyObjectId] = Field(default_factory=list)
 
@@ -66,21 +85,36 @@ class CatchBase(BaseModel):
     photo_url: str = Field(..., pattern=r'^https?://.+')
     location: Location
     shared_with_followers: bool = False
+    add_to_map: bool = False
 
 class CatchCreate(CatchBase):
-    pass
+    # Optional Cloudinary fields for enhanced functionality
+    photo_public_id: Optional[str] = Field(None, description="Cloudinary public ID for image management")
+    thumbnail_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Thumbnail URL for optimized loading")
+    small_thumbnail_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Small thumbnail for lists/maps")
+    optimized_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Optimized URL for detail views")
 
 class CatchUpdate(BaseModel):
     species: Optional[str] = Field(None, min_length=1, max_length=100)
     weight: Optional[float] = Field(None, gt=0)
     photo_url: Optional[str] = Field(None, pattern=r'^https?://.+')
+    photo_public_id: Optional[str] = Field(None, description="Cloudinary public ID for image management")
+    thumbnail_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Thumbnail URL for optimized loading")
+    small_thumbnail_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Small thumbnail for lists/maps")
+    optimized_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Optimized URL for detail views")
     location: Optional[Location] = None
     shared_with_followers: Optional[bool] = None
+    add_to_map: Optional[bool] = None
 
 class Catch(CatchBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user_id: PyObjectId
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    # Optional Cloudinary fields
+    photo_public_id: Optional[str] = Field(None, description="Cloudinary public ID for image management")
+    thumbnail_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Thumbnail URL for optimized loading")
+    small_thumbnail_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Small thumbnail for lists/maps")
+    optimized_url: Optional[str] = Field(None, pattern=r'^https?://.+', description="Optimized URL for detail views")
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -110,3 +144,30 @@ class Pin(PinBase):
         arbitrary_types_allowed=True,
         json_encoders={ObjectId: str}
     )
+
+# Authentication Models
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int = 1800  # 30 minutes in seconds
+
+class TokenRefresh(BaseModel):
+    refresh_token: str
+
+class AuthResponse(BaseModel):
+    user: User
+    token: Token
+
+# Upload/Cloudinary Models
+class ThumbnailResponse(BaseModel):
+    thumbnail_url: str
+    public_id: str
+    width: int
+    height: int
+
+class OptimizedResponse(BaseModel):
+    optimized_url: str
+    public_id: str
+    width: Optional[int] = None
+    height: Optional[int] = None

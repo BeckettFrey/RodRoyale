@@ -4,6 +4,7 @@ from bson import ObjectId
 import math
 from models.schemas import Pin, PinCreate, PinUpdate
 from database import get_database
+from auth import get_current_user
 
 def calculate_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
     """Calculate distance between two points in kilometers using Haversine formula"""
@@ -23,27 +24,17 @@ def calculate_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> fl
 router = APIRouter(prefix="/pins", tags=["pins"])
 
 @router.post("/", response_model=Pin, status_code=status.HTTP_201_CREATED)
-async def create_pin(pin_data: PinCreate, user_id: str = Query(...), db=Depends(get_database)):
-    """Add a catch to the map"""
+async def create_pin(
+    pin_data: PinCreate, 
+    current_user = Depends(get_current_user),  # Require authentication
+    db=Depends(get_database)
+):
+    """Add a catch to the map (requires authentication)"""
     try:
-        if not ObjectId.is_valid(user_id):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid user ID format"
-            )
-        
         if not ObjectId.is_valid(str(pin_data.catch_id)):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid catch ID format"
-            )
-        
-        # Check if user exists
-        user = await db.users.find_one({"_id": ObjectId(user_id)})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
             )
         
         # Check if catch exists and belongs to user
@@ -54,7 +45,8 @@ async def create_pin(pin_data: PinCreate, user_id: str = Query(...), db=Depends(
                 detail="Catch not found"
             )
         
-        if catch["user_id"] != ObjectId(user_id):
+        # Ensure user can only pin their own catches
+        if catch["user_id"] != current_user["_id"]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Cannot pin another user's catch"
@@ -70,7 +62,7 @@ async def create_pin(pin_data: PinCreate, user_id: str = Query(...), db=Depends(
         
         # Create new pin
         pin_dict = pin_data.dict()
-        pin_dict["user_id"] = ObjectId(user_id)
+        pin_dict["user_id"] = current_user["_id"]  # Use authenticated user's ID
         pin_dict["catch_id"] = ObjectId(str(pin_data.catch_id))
         
         result = await db.pins.insert_one(pin_dict)
@@ -88,27 +80,16 @@ async def create_pin(pin_data: PinCreate, user_id: str = Query(...), db=Depends(
 
 @router.get("/", response_model=List[dict])
 async def get_pins(
-    viewer_id: str = Query(..., description="ID of the user viewing the pins"),
+    current_user = Depends(get_current_user),  # Require authentication
     lat: Optional[float] = Query(None, ge=-90, le=90, description="Center latitude for filtering"),
     lng: Optional[float] = Query(None, ge=-180, le=180, description="Center longitude for filtering"),
     radius: Optional[float] = Query(None, gt=0, description="Radius in kilometers for filtering"),
     db=Depends(get_database)
 ):
-    """Retrieve all map pins the user has access to (based on follower/mutual status)"""
+    """Retrieve map pins accessible to the authenticated user"""
     try:
-        if not ObjectId.is_valid(viewer_id):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid viewer ID format"
-            )
-        
-        # Get viewer information
-        viewer = await db.users.find_one({"_id": ObjectId(viewer_id)})
-        if not viewer:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Viewer not found"
-            )
+        # Get authenticated user information (required)
+        viewer_id = current_user["_id"]
         
         # Build aggregation pipeline for access control
         pipeline = []
@@ -144,21 +125,21 @@ async def get_pins(
         all_pins = await cursor.to_list(length=None)
         
         accessible_pins = []
-        viewer_following = set(viewer.get("following", []))
+        viewer_following = set(current_user.get("following", []))
         
         for pin_data in all_pins:
             pin_owner_id = pin_data["user_id"]
             visibility = pin_data["visibility"]
             
             # Always allow user to see their own pins
-            if pin_owner_id == ObjectId(viewer_id):
+            if pin_owner_id == viewer_id:
                 accessible = True
             elif visibility == "public":
                 accessible = True
             elif visibility == "mutuals":
                 # Check if mutual follow (viewer follows owner AND owner follows viewer)
                 accessible = (pin_owner_id in viewer_following and 
-                            ObjectId(viewer_id) in pin_data["pin_owner"].get("followers", []))
+                            viewer_id in pin_data["pin_owner"].get("followers", []))
             else:  # private
                 accessible = False
             
@@ -166,9 +147,8 @@ async def get_pins(
                 # Check catch sharing settings
                 catch_info = pin_data["catch_info"]
                 if catch_info.get("shared_with_followers", False):
-                    # If catch is shared with followers only, check if viewer is a follower
-                    if (pin_owner_id != ObjectId(viewer_id) and 
-                        ObjectId(viewer_id) not in pin_data["pin_owner"].get("followers", [])):
+                    # If catch is shared with followers only, check if viewer is a follower or owner
+                    if pin_owner_id != viewer_id and viewer_id not in pin_data["pin_owner"].get("followers", []):
                         continue
                 
                 # Prepare response data
@@ -210,13 +190,18 @@ async def get_pins(
         )
 
 @router.put("/{pin_id}", response_model=Pin)
-async def update_pin(pin_id: str, pin_data: PinUpdate, user_id: str = Query(...), db=Depends(get_database)):
-    """Update pin location or visibility"""
+async def update_pin(
+    pin_id: str, 
+    pin_data: PinUpdate, 
+    current_user = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    """Update pin location or visibility (requires authentication)"""
     try:
-        if not ObjectId.is_valid(pin_id) or not ObjectId.is_valid(user_id):
+        if not ObjectId.is_valid(pin_id):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid ID format"
+                detail="Invalid pin ID format"
             )
         
         # Check if pin exists and belongs to user
@@ -227,7 +212,7 @@ async def update_pin(pin_id: str, pin_data: PinUpdate, user_id: str = Query(...)
                 detail="Pin not found"
             )
         
-        if pin["user_id"] != ObjectId(user_id):
+        if pin["user_id"] != current_user["_id"]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not authorized to update this pin"
@@ -261,13 +246,17 @@ async def update_pin(pin_id: str, pin_data: PinUpdate, user_id: str = Query(...)
         )
 
 @router.delete("/{pin_id}")
-async def delete_pin(pin_id: str, user_id: str = Query(...), db=Depends(get_database)):
-    """Delete a pin"""
+async def delete_pin(
+    pin_id: str, 
+    current_user = Depends(get_current_user), 
+    db=Depends(get_database)
+):
+    """Delete a pin (requires authentication)"""
     try:
-        if not ObjectId.is_valid(pin_id) or not ObjectId.is_valid(user_id):
+        if not ObjectId.is_valid(pin_id):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid ID format"
+                detail="Invalid pin ID format"
             )
         
         # Check if pin exists and belongs to user
@@ -278,7 +267,7 @@ async def delete_pin(pin_id: str, user_id: str = Query(...), db=Depends(get_data
                 detail="Pin not found"
             )
         
-        if pin["user_id"] != ObjectId(user_id):
+        if pin["user_id"] != current_user["_id"]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not authorized to delete this pin"

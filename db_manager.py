@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database Management Utility for Catchy Backend
+Database Management Utility for Rod Royale Backend
 Provides tools for database initialization, seeding, and cleanup
 """
 
@@ -12,11 +12,11 @@ import os
 
 # Default MongoDB settings
 MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
-DATABASE_NAME = os.getenv("DATABASE_NAME", "catchy_db")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "rod_royale_db")
 
 async def init_database():
     """Initialize database with indexes"""
-    print("🔧 Initializing Catchy database...")
+    print("🔧 Initializing Rod Royale database...")
     
     client = AsyncIOMotorClient(MONGODB_URL)
     db = client[DATABASE_NAME]
@@ -68,14 +68,14 @@ async def seed_database():
         sample_users = [
             {
                 "username": "demo_angler",
-                "email": "demo@catchy.com",
+                "email": "demo@Rod Royale.com",
                 "bio": "Demo angler account for testing",
                 "followers": [],
                 "following": []
             },
             {
                 "username": "bass_master",
-                "email": "bass@catchy.com", 
+                "email": "bass@Rod Royale.com", 
                 "bio": "Bass fishing expert from Florida",
                 "followers": [],
                 "following": []
@@ -218,7 +218,7 @@ async def show_stats():
 
 def print_usage():
     """Print usage information"""
-    print("Catchy Database Management Utility")
+    print("Rod Royale Database Management Utility")
     print("=" * 40)
     print("Usage: python db_manager.py <command>")
     print()

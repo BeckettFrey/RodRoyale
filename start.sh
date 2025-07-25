@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Catchy Backend Startup Script
-echo "🎣 Starting Catchy Backend API..."
+# Rod Royale Backend Startup Script
+echo "🎣 Starting Rod Royale Backend API..."
 
 # Check if Python is installed
 if ! command -v python3 &> /dev/null; then
@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 # Set environment variables (modify as needed)
 export MONGODB_URL=${MONGODB_URL:-"mongodb://localhost:27017"}
-export DATABASE_NAME=${DATABASE_NAME:-"catchy_db"}
+export DATABASE_NAME=${DATABASE_NAME:-"Rod Royale_db"}
 
 echo "🚀 Starting FastAPI server..."
 echo "🌐 API will be available at: http://localhost:8000"

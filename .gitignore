@@ -17,6 +17,9 @@ env/
 ENV/
 __pycache__
 
+# Uploaded files
+uploads/
+
 # Distribution / packaging
 .Python
 build/

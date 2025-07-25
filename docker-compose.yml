@@ -4,35 +4,35 @@ services:
   # MongoDB database
   mongodb:
     image: mongo:7.0
-    container_name: catchy-mongodb
+    container_name: Rod Royale-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: catchy_db
+      MONGO_INITDB_DATABASE: Rod Royale_db
     volumes:
       - mongodb_data:/data/db
     networks:
-      - catchy-network
+      - Rod Royale-network
 
-  # Catchy Backend API
+  # Rod Royale Backend API
   api:
     build: .
-    container_name: catchy-api
+    container_name: Rod Royale-api
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
       - MONGODB_URL=mongodb://mongodb:27017
-      - DATABASE_NAME=catchy_db
+      - DATABASE_NAME=Rod Royale_db
     depends_on:
       - mongodb
     networks:
-      - catchy-network
+      - Rod Royale-network
 
 volumes:
   mongodb_data:
 
 networks:
-  catchy-network:
+  Rod Royale-network:
     driver: bridge

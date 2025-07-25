@@ -1,14 +1,16 @@
-# 🎣 Catchy Backend API
+# 🎣 Rod Royale Backend API
 
-A RESTful API built with FastAPI and MongoDB for Catchy - a social fishing application where anglers can share their catches, follow other fishers, and discover fishing spots on an interactive map.
+A RESTful API built with FastAPI and MongoDB for Rod Royale - a social fishing application where anglers can share their catches, follow other fishers, and discover fishing spots on an interactive map.
 
 ## 🚀 Features
 
 - **User Management**: User registration, profiles, following/followers system
 - **Catch Sharing**: Upload and share fishing catches with photos and details
+- **Cloud Image Storage**: Cloudinary integration for optimized image upload and delivery
 - **Interactive Map**: Pin catches to map locations with privacy controls
 - **Access Control**: Granular privacy settings (private, mutuals, public)
 - **Real-time Data**: Async MongoDB operations for optimal performance
+- **Image Optimization**: Automatic image compression, format conversion, and thumbnail generation
 
 ## 💾 Tech Stack
 
@@ -39,6 +41,8 @@ A RESTful API built with FastAPI and MongoDB for Catchy - a social fishing appli
   "species": "string",
   "weight": "float",
   "photo_url": "string",
+  "photo_public_id": "optional string (Cloudinary)",
+  "thumbnail_url": "optional string (Cloudinary)",
   "location": {
     "lat": "float",
     "lng": "float"
@@ -67,6 +71,7 @@ A RESTful API built with FastAPI and MongoDB for Catchy - a social fishing appli
 ### Prerequisites
 - Python 3.8+
 - MongoDB (local installation or MongoDB Atlas)
+- Cloudinary account (free tier available at https://cloudinary.com)
 - Docker (optional, for containerized deployment)
 
 ### Quick Start
@@ -74,10 +79,15 @@ A RESTful API built with FastAPI and MongoDB for Catchy - a social fishing appli
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd Catchy-Backend
+   cd Rod Royale-Backend
    ```
 
-2. **Run the startup script**
+2. **Set up Cloudinary**
+   - Sign up for a free Cloudinary account at https://cloudinary.com
+   - Get your Cloud Name, API Key, and API Secret from the dashboard
+   - Add these to your environment variables (see step 3 in Manual Setup)
+
+3. **Run the startup script**
    ```bash
    ./start.sh
    ```
@@ -117,9 +127,14 @@ The API will be available at `http://localhost:8000`
    # Copy example environment file
    cp .env.example .env
    
-   # Edit .env with your MongoDB settings
+   # Edit .env with your settings:
    export MONGODB_URL="mongodb://localhost:27017"  # or your MongoDB Atlas URL
-   export DATABASE_NAME="catchy_db"
+   export DATABASE_NAME="Rod Royale_db"
+   
+   # Required: Cloudinary configuration for image storage
+   export CLOUDINARY_CLOUD_NAME="your_cloud_name"
+   export CLOUDINARY_API_KEY="your_api_key" 
+   export CLOUDINARY_API_SECRET="your_api_secret"
    ```
 
 4. **Initialize database**
@@ -135,27 +150,65 @@ The API will be available at `http://localhost:8000`
 
 ## 📡 API Endpoints
 
+### Authentication
+- `POST /api/v1/auth/register` - Register a new user with password
+- `POST /api/v1/auth/login` - Login and receive JWT tokens
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `GET /api/v1/auth/me` - Get current user profile (requires authentication)
+- `POST /api/v1/auth/logout` - Logout (client-side token deletion)
+
 ### Users
-- `POST /api/v1/users` - Create a new user
+- `POST /api/v1/users` - Create a new user (with password)
 - `GET /api/v1/users/{user_id}` - Get user profile
-- `PUT /api/v1/users/{user_id}` - Update user profile
+- `PUT /api/v1/users/{user_id}` - Update user profile (requires authentication)
 - `POST /api/v1/users/{user_id}/follow/{target_user_id}` - Follow user
 - `DELETE /api/v1/users/{user_id}/follow/{target_user_id}` - Unfollow user
 
 ### Catches
-- `POST /api/v1/catches` - Upload new catch
-- `GET /api/v1/catches/{catch_id}` - Get single catch
-- `GET /api/v1/catches/users/{user_id}/catches` - List user's catches
-- `PUT /api/v1/catches/{catch_id}` - Update catch
-- `DELETE /api/v1/catches/{catch_id}` - Delete catch
+- `POST /api/v1/catches` - Upload new catch (requires authentication)
+- `GET /api/v1/catches/{catch_id}` - Get single catch (optional authentication for access control)
+- `GET /api/v1/catches/me` - Get current user's catches (requires authentication)
+- `GET /api/v1/catches/users/{user_id}/catches` - List user's catches (optional authentication)
+- `PUT /api/v1/catches/{catch_id}` - Update catch (requires authentication, own catches only)
+- `DELETE /api/v1/catches/{catch_id}` - Delete catch (requires authentication, own catches only)
 
 ### Pins
-- `POST /api/v1/pins` - Add catch to map
-- `GET /api/v1/pins` - Get accessible map pins
-- `PUT /api/v1/pins/{pin_id}` - Update pin
-- `DELETE /api/v1/pins/{pin_id}` - Delete pin
+- `POST /api/v1/pins` - Add catch to map (requires authentication)
+- `GET /api/v1/pins` - Get accessible map pins (optional authentication for access control)
+- `PUT /api/v1/pins/{pin_id}` - Update pin (requires authentication, own pins only)
+- `DELETE /api/v1/pins/{pin_id}` - Delete pin (requires authentication, own pins only)
 
-## 🛡️ Access Control Logic
+### Image Upload & Management (Cloudinary)
+- `POST /api/v1/upload/image` - Upload image to Cloudinary
+- `POST /api/v1/catches/upload-with-image` - Create catch with image upload
+- `DELETE /api/v1/upload/image/{public_id}` - Delete image from Cloudinary
+- `GET /api/v1/upload/image/{public_id}/thumbnail` - Generate thumbnail URL
+- `GET /api/v1/upload/image/{public_id}/optimized` - Generate optimized URL
+
+## � Authentication
+
+The API now includes a complete JWT-based authentication system:
+
+### Features
+- **User Registration** with password hashing (bcrypt)
+- **Login/Logout** with JWT access and refresh tokens
+- **Protected Routes** requiring authentication
+- **Token Refresh** for extended sessions
+- **Password Updates** with secure hashing
+
+### Token Usage
+After login/registration, include the JWT token in the Authorization header:
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### Token Expiration
+- **Access Token**: 30 minutes
+- **Refresh Token**: 7 days
+
+Use the refresh endpoint to get new tokens before they expire.
+
+## �🛡️ Access Control Logic
 
 The API implements sophisticated access control:
 
@@ -172,6 +225,7 @@ Once the server is running, you can:
 2. **Alternative Docs**: Visit `http://localhost:8000/redoc` for ReDoc documentation
 3. **Health Check**: Visit `http://localhost:8000/health` to verify the API is running
 4. **Run Test Script**: Execute `python3 test_api.py` to test all endpoints
+5. **Test Authentication**: Execute `python3 test_auth.py` to test authentication system
 
 ### Database Management
 
@@ -193,21 +247,45 @@ python3 db_manager.py clear
 
 ### Example API Calls
 
-**Create a User:**
+**Register a User:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/register" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "username": "angler_mike",
+       "email": "mike@example.com",
+       "bio": "Passionate bass fisherman from Texas",
+       "password": "securepassword123"
+     }'
+```
+
+**Login:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/auth/login" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "email": "mike@example.com",
+       "password": "securepassword123"
+     }'
+```
+
+**Create a User (Alternative):**
 ```bash
 curl -X POST "http://localhost:8000/api/v1/users" \
      -H "Content-Type: application/json" \
      -d '{
        "username": "angler_mike",
        "email": "mike@example.com",
-       "bio": "Passionate bass fisherman from Texas"
+       "bio": "Passionate bass fisherman from Texas",
+       "password": "securepassword123"
      }'
 ```
 
-**Upload a Catch:**
+**Upload a Catch (with Authentication):**
 ```bash
-curl -X POST "http://localhost:8000/api/v1/catches?user_id=USER_ID" \
+curl -X POST "http://localhost:8000/api/v1/catches" \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN" \
      -d '{
        "species": "Largemouth Bass",
        "weight": 3.5,
@@ -215,6 +293,18 @@ curl -X POST "http://localhost:8000/api/v1/catches?user_id=USER_ID" \
        "location": {"lat": 30.2672, "lng": -97.7431},
        "shared_with_followers": false
      }'
+```
+
+**Get Current User Profile:**
+```bash
+curl -X GET "http://localhost:8000/api/v1/auth/me" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+**Upload an Image:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/upload/image" \
+     -F "file=@/path/to/your/image.jpg"
 ```
 
 ## 🗃️ Database Indexes
@@ -230,7 +320,7 @@ The application automatically creates optimized indexes:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `MONGODB_URL` | `mongodb://localhost:27017` | MongoDB connection string |
-| `DATABASE_NAME` | `catchy_db` | Database name |
+| `DATABASE_NAME` | `Rod Royale_db` | Database name |
 
 ## 🚦 Development Status
 

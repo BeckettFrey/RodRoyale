@@ -23,7 +23,7 @@ EXPOSE 8000
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV MONGODB_URL=mongodb://mongodb:27017
-ENV DATABASE_NAME=catchy_db
+ENV DATABASE_NAME=Rod Royale_db
 
 # Run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

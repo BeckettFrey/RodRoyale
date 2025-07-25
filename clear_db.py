@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database Clearing Script for Catchy Backend
+Database Clearing Script for Rod Royale Backend
 Clears all collections to start with a fresh database
 """
 
@@ -14,11 +14,11 @@ load_dotenv()
 
 # Database configuration
 MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
-DATABASE_NAME = os.getenv("DATABASE_NAME", "catchy_db")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "rod_royale_db")
 
 async def clear_database():
     """Clear all collections in the database"""
-    print("🗑️  Clearing Catchy Database")
+    print("🗑️  Clearing Rod Royale Database")
     print("=" * 40)
     
     try:
@@ -74,7 +74,7 @@ def run_api_tests():
 
 async def main():
     """Main function to clear database and optionally run tests"""
-    print("🎣 Catchy Backend - Database Reset & Test")
+    print("🎣 Rod Royale Backend - Database Reset & Test")
     print("=" * 50)
     
     # Clear the database
