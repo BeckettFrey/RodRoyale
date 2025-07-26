@@ -12,7 +12,7 @@ def create_test_user():
     
     user_data = {
         "username": "testuser",
-        "email": "test@Rod Royale.com",
+        "email": "test@RodRoyale.com",
         "password": "testpassword123",
         "bio": "Test user for debugging iOS issues"
     }

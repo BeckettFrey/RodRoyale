@@ -34,9 +34,9 @@ def test_account_deletion():
         return
     
     # Show warning
-    print(f"\n⚠️  WARNING: About to delete account!")
+    print("\n⚠️  WARNING: About to delete account!")
     print(f"   User ID: {user_id}")
-    print(f"   This action cannot be undone!")
+    print("   This action cannot be undone!")
     
     # Ask for confirmation
     confirm = input("\nType 'DELETE' to proceed with account deletion: ")
@@ -45,7 +45,7 @@ def test_account_deletion():
         return
     
     # Perform deletion
-    print(f"\n2️⃣  Deleting account...")
+    print("\n2️⃣  Deleting account...")
     delete_response = requests.delete(f"{BASE_URL}/users/me", headers=headers)
     
     print(f"📊 Delete Status: {delete_response.status_code}")
@@ -54,7 +54,7 @@ def test_account_deletion():
         print("✅ Account deleted successfully!")
         
         # Try to access the account (should fail)
-        print(f"\n3️⃣  Verifying deletion...")
+        print("\n3️⃣  Verifying deletion...")
         verify_response = requests.get(f"{BASE_URL}/auth/me", headers=headers)
         
         if verify_response.status_code == 401 or verify_response.status_code == 404:
@@ -93,10 +93,10 @@ def show_endpoint_details():
     print("   • Removes you from all followed users' followers lists")
     print("   • Updates follower/following counts for affected users")
     
-    print(f"\n🌐 Curl Example:")
+    print("\n🌐 Curl Example:")
     print(f"curl -X DELETE \"{BASE_URL}/users/me\" \\")
-    print(f"  -H \"Authorization: Bearer YOUR_TOKEN\" \\")
-    print(f"  -H \"Content-Type: application/json\"")
+    print("  -H \"Authorization: Bearer YOUR_TOKEN\" \\")
+    print("  -H \"Content-Type: application/json\"")
 
 def main():
     """Main test function"""
@@ -109,8 +109,8 @@ def main():
     show_endpoint_details()
     
     # Ask if user wants to test (dangerous!)
-    print(f"\n🚨 DANGER ZONE:")
-    print(f"The following test will PERMANENTLY DELETE the authenticated user account!")
+    print("\n🚨 DANGER ZONE:")
+    print("The following test will PERMANENTLY DELETE the authenticated user account!")
     
     proceed = input("\nDo you want to proceed with the deletion test? (y/N): ").lower().strip()
     

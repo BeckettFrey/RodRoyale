@@ -47,6 +47,10 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class PasswordChange(BaseModel):
+    current_password: str = Field(..., description="Current password for verification")
+    new_password: str = Field(..., min_length=6, max_length=100, description="New password")
+
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=50)
     email: Optional[EmailStr] = None

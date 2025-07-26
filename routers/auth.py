@@ -3,8 +3,8 @@ from bson import ObjectId
 import logging
 
 from models.schemas import (
-    UserCreate, UserLogin, User, Token, TokenRefresh, 
-    AuthResponse
+    UserCreate, UserLogin, User, Token, 
+    TokenRefresh, AuthResponse, PasswordChange
 )
 from database import get_database
 from auth import AuthUtils, get_current_user
@@ -168,3 +168,56 @@ async def get_current_user_profile(current_user = Depends(get_current_user)):
 async def logout():
     """Logout user (client should delete tokens)"""
     return {"message": "Successfully logged out. Please delete your tokens on the client side."}
+
+@router.post("/change-password")
+async def change_password(
+    password_data: PasswordChange,
+    current_user = Depends(get_current_user),
+    db = Depends(get_database)
+):
+    """Change user password with current password verification"""
+    try:
+        # Verify current password
+        if not AuthUtils.verify_password(password_data.current_password, current_user["password_hash"]):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect"
+            )
+        
+        # Check if new password is different from current
+        if AuthUtils.verify_password(password_data.new_password, current_user["password_hash"]):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="New password must be different from current password"
+            )
+        
+        # Hash new password
+        new_password_hash = AuthUtils.hash_password(password_data.new_password)
+        
+        # Update password in database
+        result = await db.users.update_one(
+            {"_id": ObjectId(current_user["_id"])},
+            {"$set": {"password_hash": new_password_hash}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update password"
+            )
+        
+        logger.info(f"Password changed successfully for user {current_user['username']}")
+        
+        return {
+            "message": "Password changed successfully",
+            "detail": "Please log in again with your new password"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Password change error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to change password: {str(e)}"
+        )
