@@ -13,8 +13,7 @@ class Settings:
     # Set CORS_ORIGINS environment variable with comma-separated origins for production
     # Example: CORS_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
     cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8080,http://localhost:8081,http://127.0.0.1:3000,http://127.0.0.1:8080,http://127.0.0.1:8081")
-    BACKEND_CORS_ORIGINS: list = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
-    
+    BACKEND_CORS_ORIGINS: list = [origin.strip() for origin in os.getenv("CORS_ORIGINS", cors_origins_str).split(",") if origin.strip()]
     # Security Configuration
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
