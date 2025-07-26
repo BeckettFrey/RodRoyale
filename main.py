@@ -64,21 +64,35 @@ if __name__ == "__main__":
     import uvicorn
     import os
     
-    # Check if SSL certificates exist for HTTPS
-    ssl_keyfile = "certificates/private.key"
-    ssl_certfile = "certificates/cert.pem"
+    # Get port from environment (for platforms like Heroku, Railway, etc.)
+    port = int(os.environ.get("PORT", 8000))
+    environment = os.getenv("ENVIRONMENT", "development")
     
-    if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
-        print("🔐 Starting server with HTTPS (SSL certificates found)")
-        uvicorn.run(
-            "main:app", 
-            host="0.0.0.0", 
-            port=8000, 
-            reload=True,
-            ssl_keyfile=ssl_keyfile,
-            ssl_certfile=ssl_certfile
-        )
+    if environment == "production":
+        print("🚀 Starting production server...")
+        print(f"   Environment: {environment}")
+        print(f"   Port: {port}")
+        print("   HTTPS handled by platform (Heroku, Railway, nginx, etc.)")
+        # Production: Let platform handle HTTPS termination
+        uvicorn.run("main:app", host="0.0.0.0", port=port)
     else:
-        print("⚠️  Starting server with HTTP (no SSL certificates found)")
-        print("   To enable HTTPS, run: ./generate_ssl_cert.sh")
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+        print("🛠️  Starting development server...")
+        # Development: Check for SSL certificates
+        ssl_keyfile = "certificates/private.key"
+        ssl_certfile = "certificates/cert.pem"
+        
+        if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
+            print("🔐 SSL certificates found - starting with HTTPS")
+            uvicorn.run(
+                "main:app", 
+                host="0.0.0.0", 
+                port=port, 
+                reload=True,
+                ssl_keyfile=ssl_keyfile,
+                ssl_certfile=ssl_certfile
+            )
+        else:
+            print("⚠️  No SSL certificates found - starting with HTTP")
+            print("   To enable HTTPS: ./generate_ssl_cert.sh")
+            print("   For production: use platform SSL or reverse proxy")
+            uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

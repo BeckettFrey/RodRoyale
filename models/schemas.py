@@ -51,6 +51,13 @@ class PasswordChange(BaseModel):
     current_password: str = Field(..., description="Current password for verification")
     new_password: str = Field(..., min_length=6, max_length=100, description="New password")
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr = Field(..., description="Email address to send reset token to")
+
+class PasswordReset(BaseModel):
+    token: str = Field(..., description="Password reset token")
+    new_password: str = Field(..., min_length=6, max_length=100, description="New password")
+
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=50)
     email: Optional[EmailStr] = None

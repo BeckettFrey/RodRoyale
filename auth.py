@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
+import os
+import secrets
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends
@@ -12,7 +14,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 # JWT Configuration
-SECRET_KEY = "your-secret-key-change-this-in-production"  # Change this in production!
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    # Generate a secure random key if not provided
+    SECRET_KEY = secrets.token_urlsafe(32)
+    logger.warning("SECRET_KEY not found in environment variables. Generated temporary key. Set SECRET_KEY in production!")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -33,6 +40,28 @@ class AuthUtils:
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash"""
         return pwd_context.verify(plain_password, hashed_password)
+    
+    @staticmethod
+    def create_password_reset_token(email: str) -> str:
+        """Create a password reset token"""
+        expire = datetime.utcnow() + timedelta(hours=1)  # Token expires in 1 hour
+        to_encode = {"sub": email, "exp": expire, "type": "password_reset"}
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt
+    
+    @staticmethod
+    def verify_password_reset_token(token: str) -> Optional[str]:
+        """Verify password reset token and return email if valid"""
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            email = payload.get("sub")
+            token_type = payload.get("type")
+            
+            if email is None or token_type != "password_reset":
+                return None
+            return email
+        except JWTError:
+            return None
     
     @staticmethod
     def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
