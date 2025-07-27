@@ -1,6 +1,6 @@
 # Rod Royale API Test Suite
 
-Comprehensive end-to-end testing for the Rod Royale fishing app backend API.
+Pending comprehensive end-to-end testing for the Rod Royale fishing app backend API.
 
 ## Overview
 
@@ -34,7 +34,7 @@ tests/
 
 1. Install test dependencies:
 ```bash
-pip install pytest pytest-asyncio httpx pytest-cov
+pip install -r requirements-dev.txt
 ```
 
 2. Ensure MongoDB is running and accessible
