@@ -19,7 +19,7 @@ class CloudinaryService:
         """Initialize Cloudinary configuration"""
         self._initialized = False
         # Allowed file extensions for images
-        self.ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'heic', 'heif'}
+        self.ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'gif', 'webp', 'heic', 'heif'}
         self.MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
     
     def _ensure_initialized(self):

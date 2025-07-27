@@ -21,7 +21,7 @@ async def create_automatic_pin(catch_id: ObjectId, catch_data: dict, user_id: Ob
             "catch_id": catch_id,
             "user_id": user_id,
             "location": catch_data["location"],
-            "visibility": "public"  # Default to public, you can make this configurable
+            "visibility": "public" 
         }
         
         # Insert the pin

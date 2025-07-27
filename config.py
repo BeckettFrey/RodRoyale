@@ -1,5 +1,8 @@
 # File: config.py
 import os
+from dotenv import load_dotenv
+
+load_dotenv() 
 
 class Settings:
     # MongoDB Configuration
@@ -8,16 +11,14 @@ class Settings:
     
     # API Configuration
     API_V1_STR: str = os.getenv("API_V1_STR", "/api/v1")
-    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "Rod Royale Backend API")
 
     # CORS - Secure configuration
     cors_origins_str = os.getenv("CORS_ORIGINS", "*")
     BACKEND_CORS_ORIGINS: list = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
 
     # Security Configuration
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "")
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
-    
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "sknmckbiyvajnjbosc")  # Use a secure key in production
+
     # Cloudinary Configuration
     CLOUDINARY_CLOUD_NAME: str = os.getenv("CLOUDINARY_CLOUD_NAME", "")
     CLOUDINARY_API_KEY: str = os.getenv("CLOUDINARY_API_KEY", "")

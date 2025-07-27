@@ -13,6 +13,8 @@ from routers import users, catches, pins, uploads, auth, leaderboard
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+print(f"Connecting to: {settings.MONGODB_URL}, Database: {settings.DATABASE_NAME}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -24,9 +26,9 @@ async def lifespan(app: FastAPI):
     await close_mongo_connection()
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
+    title="Rod Royale Backend API",
     version="1.0.0",
-    description=os.getenv("API_DESCRIPTION", "Rod Royale Backend API"),
+    description="Rod Royale Backend API - A social app",
     lifespan=lifespan
 )
 
@@ -35,7 +37,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
+    # allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_methods=["*"],
+    # allow_headers=["Content-Type", "Authorization", "X-Requested-With"], 
     allow_headers=["*"],
 )
 
@@ -64,8 +68,8 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     import os
-    
-    port = int(os.environ.get("PORT", 8000))
+
+    port = int(os.getenv("PORT", 8000))
     environment = os.getenv("ENVIRONMENT", "development")
     
     if environment == "production":
@@ -77,22 +81,9 @@ if __name__ == "__main__":
         uvicorn.run("main:app", host="0.0.0.0", port=port)
     else:
         print("🛠️  Starting development server...")
-        # Development: Check for SSL certificates
-        ssl_keyfile = "certificates/private.key"
-        ssl_certfile = "certificates/cert.pem"
-        
-        if os.path.exists(ssl_keyfile) and os.path.exists(ssl_certfile):
-            print("🔐 SSL certificates found - starting with HTTPS")
-            uvicorn.run(
-                "main:app", 
-                host="0.0.0.0", 
-                port=port, 
-                reload=True,
-                ssl_keyfile=ssl_keyfile,
-                ssl_certfile=ssl_certfile
-            )
-        else:
-            print("⚠️  No SSL certificates found - starting with HTTP")
-            print("   To enable HTTPS: ./generate_ssl_cert.sh")
-            print("   For production: use platform SSL or reverse proxy")
-            uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+        uvicorn.run(
+            "main:app", 
+            host="0.0.0.0", 
+            port=port, 
+            reload=True,
+        )

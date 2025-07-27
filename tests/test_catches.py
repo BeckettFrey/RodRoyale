@@ -117,11 +117,19 @@ class TestCatchEndpoints:
         
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     
-    def test_upload_with_image_success(self, client):
-        """Test catch creation with image upload."""
+    from unittest.mock import patch
+
+    @patch("services.cloudinary_service.cloudinary.uploader.upload")
+    def test_upload_with_image_success(self, mock_upload, client):
+        """Test catch creation with image upload (Cloudinary mocked)."""
         user_id, auth_headers = create_test_user_and_auth(client)
-        
-        # Mock multipart form data
+
+        # Mock Cloudinary response
+        mock_upload.return_value = {
+            "secure_url": "https://fake.cloudinary.com/fake.jpg",
+            "public_id": "Rod Royale/catches/fake-id"
+        }
+
         catch_data = {
             "species": "Trout",
             "weight": "2.5",
@@ -130,11 +138,8 @@ class TestCatchEndpoints:
             "shared_with_followers": "true",
             "add_to_map": "true"
         }
-        
-        # This would require actual file upload testing
-        # For now, we'll test the endpoint exists and requires auth
+
         response = client.post("/api/v1/catches/upload-with-image", data=catch_data, headers=auth_headers)
-        
         # Expecting validation error due to missing file, not auth error
         assert response.status_code != status.HTTP_403_FORBIDDEN
     
