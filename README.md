@@ -161,7 +161,7 @@ Exciting features planned for future releases:
 
 ## 🤝 Contributing
 
-During staging I would appreciate any feedback or suggestions see CONTRIBUTING.md!
+During staging I would appreciate any feedback or suggestions; see CONTRIBUTING.md!
 
 ### Development Setup
 ```bash
