@@ -1,3 +1,4 @@
 faker
 pytest==8.4.1
 pluggy==1.6.0
+httpx==0.25.0
