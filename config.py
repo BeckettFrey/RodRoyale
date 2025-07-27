@@ -3,7 +3,7 @@ import os
 
 class Settings:
     # MongoDB Configuration
-    MONGODB_URL: str = os.getenv("MONGODB_URL", "")
+    MONGODB_URL: str = os.getenv("MONGODB_URL", "localhost:27017")
     DATABASE_NAME: str = os.getenv("DATABASE_NAME", "rod_royale_db")
     
     # API Configuration
@@ -12,7 +12,7 @@ class Settings:
 
     # CORS - Secure configuration
     cors_origins_str = os.getenv("CORS_ORIGINS", "")
-    BACKEND_CORS_ORIGINS: list = [origin for origin in os.getenv("CORS_ORIGINS", "").split(",") if origin.strip()]
+    BACKEND_CORS_ORIGINS: list = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
 
     # Security Configuration
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
@@ -22,6 +22,10 @@ class Settings:
     CLOUDINARY_CLOUD_NAME: str = os.getenv("CLOUDINARY_CLOUD_NAME", "")
     CLOUDINARY_API_KEY: str = os.getenv("CLOUDINARY_API_KEY", "")
     CLOUDINARY_API_SECRET: str = os.getenv("CLOUDINARY_API_SECRET", "")
+
+    # Token Expiration Settings
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)) 
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))  
     
     class Config:
         case_sensitive = True

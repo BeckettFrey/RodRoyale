@@ -1,7 +1,6 @@
 # File: auth.py
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
-import os
 import secrets
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -10,20 +9,21 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from bson import ObjectId
 from database import get_database
 import logging
+from config import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 # JWT Configuration
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = settings.SECRET_KEY
 if not SECRET_KEY:
     # Generate a secure random key if not provided
     SECRET_KEY = secrets.token_urlsafe(32)
     logger.warning("SECRET_KEY not found in environment variables. Generated temporary key. Set SECRET_KEY in production!")
 
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ALGORITHM = getattr(settings, 'ALGORITHM', 'HS256')
+ACCESS_TOKEN_EXPIRE_MINUTES = getattr(settings, 'ACCESS_TOKEN_EXPIRE_MINUTES', 30)
+REFRESH_TOKEN_EXPIRE_DAYS = getattr(settings, 'REFRESH_TOKEN_EXPIRE_DAYS', 7)
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -40,12 +40,18 @@ class AuthUtils:
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash"""
-        return pwd_context.verify(plain_password, hashed_password)
+        if not plain_password or not hashed_password:
+            return False
+        try:
+            return pwd_context.verify(plain_password, hashed_password)
+        except Exception as e:
+            logger.error(f"Password verification error: {e}")
+            return False
     
     @staticmethod
     def create_password_reset_token(email: str) -> str:
         """Create a password reset token"""
-        expire = datetime.utcnow() + timedelta(hours=1)  # Token expires in 1 hour
+        expire = datetime.now(timezone.utc) + timedelta(minutes=60)
         to_encode = {"sub": email, "exp": expire, "type": "password_reset"}
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
@@ -61,7 +67,12 @@ class AuthUtils:
             if email is None or token_type != "password_reset":
                 return None
             return email
-        except JWTError:
+        # ESSENTIAL: Handle specific JWT exceptions
+        except jwt.ExpiredSignatureError:
+            logger.warning("Password reset token has expired")
+            return None
+        except JWTError as e:
+            logger.warning(f"Password reset token validation error: {e}")
             return None
     
     @staticmethod
@@ -69,10 +80,11 @@ class AuthUtils:
         """Create JWT access token"""
         to_encode = data.copy()
         if expires_delta:
-            expire = datetime.utcnow() + expires_delta
+            # ESSENTIAL: Use timezone.utc consistently
+            expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        
+            expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
         to_encode.update({"exp": expire, "type": "access"})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
@@ -81,7 +93,7 @@ class AuthUtils:
     def create_refresh_token(data: dict) -> str:
         """Create JWT refresh token"""
         to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
         to_encode.update({"exp": expire, "type": "refresh"})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
@@ -92,6 +104,20 @@ class AuthUtils:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             return payload
+        except jwt.ExpiredSignatureError:
+            logger.warning("Token has expired")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        except jwt.InvalidTokenError:
+            logger.warning("Invalid token format")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         except JWTError as e:
             logger.error(f"JWT decode error: {e}")
             raise HTTPException(
@@ -112,9 +138,6 @@ async def get_current_user(
         user_id: str = payload.get("sub")
         token_type: str = payload.get("type")
         
-        logger.info(f"JWT payload: {payload}")  # Debug logging
-        logger.info(f"User ID from token: {user_id}, Token type: {token_type}")  # Debug logging
-        
         if user_id is None or token_type != "access":
             logger.error(f"Invalid token payload: user_id={user_id}, token_type={token_type}")
             raise HTTPException(
@@ -122,6 +145,7 @@ async def get_current_user(
                 detail="Could not validate credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+        
     except JWTError as e:
         logger.error(f"JWT Error: {e}")
         raise HTTPException(
@@ -137,13 +161,20 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid user ID",
         )
-    
-    user = await db.users.find_one({"_id": ObjectId(user_id)})
-    if user is None:
-        logger.error(f"User not found in database: {user_id}")
+
+    try:
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if user is None:
+            logger.error(f"User not found in database: {user_id}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+    except Exception as e:
+        logger.error(f"Database error while fetching user {user_id}: {e}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
         )
     
     logger.info(f"Successfully authenticated user: {user.get('username', 'Unknown')}")
