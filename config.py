@@ -11,7 +11,7 @@ class Settings:
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "Rod Royale Backend API")
 
     # CORS - Secure configuration
-    cors_origins_str = os.getenv("CORS_ORIGINS", "")
+    cors_origins_str = os.getenv("CORS_ORIGINS", "*")
     BACKEND_CORS_ORIGINS: list = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
 
     # Security Configuration
