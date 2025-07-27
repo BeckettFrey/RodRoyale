@@ -38,10 +38,11 @@ jobs:
       - name: Run tests with coverage
         run: |
           source venv/bin/activate
-          pytest --cov=. --cov-report=xml --maxfail=2 --disable-warnings --tb=short
+          pytest --cov=. --cov-report=xml --disable-warnings --tb=short
       - name: Upload coverage to Codecov
+        if: always()
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
-          fail_ci_if_error: true
+          fail_ci_if_error: false
