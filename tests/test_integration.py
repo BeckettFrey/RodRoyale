@@ -1,3 +1,4 @@
+# File: tests/test_integration.py
 """
 Integration tests for Rod Royale API
 Tests complex workflows and cross-endpoint interactions

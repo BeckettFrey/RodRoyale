@@ -1,3 +1,4 @@
+# File: generate_security_key.py
 #!/usr/bin/env python3
 """
 Security Key Generator for Rod Royale API

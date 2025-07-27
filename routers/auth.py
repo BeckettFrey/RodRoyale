@@ -1,3 +1,4 @@
+# File: routers/auth.py
 from fastapi import APIRouter, HTTPException, Depends, status
 from bson import ObjectId
 import logging

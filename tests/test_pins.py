@@ -1,3 +1,4 @@
+# File: tests/test_pins.py
 """
 Pin management endpoint tests for Rod Royale API - Converted to synchronous API-based tests
 """

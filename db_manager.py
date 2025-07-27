@@ -1,3 +1,4 @@
+# File: db_manager.py
 #!/usr/bin/env python3
 """
 Database Management Utility for Rod Royale Backend

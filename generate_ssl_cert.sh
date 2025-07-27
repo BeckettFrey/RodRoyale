@@ -1,3 +1,4 @@
+# File: generate_ssl_cert.sh
 #!/bin/bash
 # Generate self-signed SSL certificate for development
 

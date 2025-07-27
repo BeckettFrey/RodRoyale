@@ -1,3 +1,4 @@
+# File: models/schemas.py
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import core_schema

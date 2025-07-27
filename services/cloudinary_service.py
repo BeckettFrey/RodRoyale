@@ -1,3 +1,4 @@
+# File: services/cloudinary_service.py
 import cloudinary
 import cloudinary.uploader
 from fastapi import HTTPException, UploadFile

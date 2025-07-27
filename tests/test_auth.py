@@ -1,3 +1,4 @@
+# File: tests/test_auth.py
 """
 Authentication endpoint tests for Rod Royale API
 """

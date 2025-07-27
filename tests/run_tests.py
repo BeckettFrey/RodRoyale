@@ -1,3 +1,4 @@
+# File: tests/run_tests.py
 """
 Test runner and utilities for Rod Royale API test suite
 Run all tests with: python -m pytest tests/ -v

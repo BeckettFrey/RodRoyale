@@ -1,8 +1,9 @@
+# File: main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
-
+import os
 
 from config import settings
 from database import connect_to_mongo, close_mongo_connection
@@ -25,14 +26,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
-    description="RESTful API for Rod Royale - A social fishing app",
+    description=os.getenv("API_DESCRIPTION", "Rod Royale Backend API"),
     lifespan=lifespan
 )
 
 # Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins="*",
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,14 +58,13 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Additional Health check to reduce confusion"""
     return {"status": "healthy", "service": "Rod Royale-backend"}
 
 if __name__ == "__main__":
     import uvicorn
     import os
     
-    # Get port from environment (for platforms like Heroku, Railway, etc.)
     port = int(os.environ.get("PORT", 8000))
     environment = os.getenv("ENVIRONMENT", "development")
     

@@ -1,3 +1,4 @@
+# File: tests/test_pins_fixed.py
 """
 Pin management endpoint tests for Rod Royale API
 """

@@ -1,3 +1,4 @@
+# File: tests/conftest.py
 """
 Test configuration and fixtures for Rod Royale API tests
 """
