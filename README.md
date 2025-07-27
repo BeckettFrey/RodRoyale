@@ -10,7 +10,7 @@
 ## 📂 Project Structure
 
 ```text
-└── RodRoyale-Backend/
+└── RodRoyale-backend/
   ├── docs/
   │   ├── LICENSE
   │   └── SECURITY_OUTLINE.md
@@ -129,7 +129,7 @@ docker-compose up --build
 - **Users** - `/users/` - Profile management and social features
 - **Catches** - `/catches/` - Create, view, and manage fishing catches
 - **Leaderboards** - `/leaderboards/` - Rankings and statistics
-- **Maps** - `/maps/` - Location-based catch discovery
+- **Pins** - `/pins/` - Location-based catch discovery
 
 ---
 
