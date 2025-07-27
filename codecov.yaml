@@ -1,0 +1,27 @@
+# See https://docs.codecov.com/docs/codecov-yaml for all options
+codecov:
+  require_ci_to_pass: false
+
+coverage:
+  status:
+    project:
+      default:
+        target: 80
+        threshold: 5
+        base: auto
+    patch:
+      default:
+        target: 80
+        threshold: 10
+        base: auto
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: true
+
+ignore:
+  - "tests/"
+  - "docs/"
+  - "__pycache__/"
+
