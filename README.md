@@ -5,7 +5,7 @@
 
 **RodRoyale Backend** is a robust FastAPI backend powering the ultimate social fishing app. Built with async MongoDB integration, it enables anglers to share catches, compete on leaderboards, and connect with the fishing community through an intuitive API.
 
-> ✅ **Production-Ready**: This API is stable and ready for deployment. Use with your own MongoDB and Cloudinary credentials.
+> ✅ **Stage-Ready**: This API is stable and ready for the staging phase of the product lifecycle. I will work on increasing test coverage intermittently.
 
 ## 📂 Project Structure
 
