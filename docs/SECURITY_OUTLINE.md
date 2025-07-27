@@ -20,7 +20,7 @@ This document provides an overview of the security mechanisms implemented in the
 - Invalid or expired tokens result in 401 Unauthorized responses.
 
 ## 5. Password Reset
-- Password reset tokens are time-limited and type-checked.
+- TODO
 
 ---
 For production, I ensure all secrets are set and use a secure deployment strategy.
