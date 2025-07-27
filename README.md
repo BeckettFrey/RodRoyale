@@ -1,6 +1,7 @@
 # RodRoyale Backend 🎣
-[![CI](https://github.com/BeckettFrey/RodRoyale-Backend/actions/workflows/test.yml/badge.svg)](https://github.com/BeckettFrey/RodRoyale-Backend/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/BeckettFrey/RodRoyale-Backend/branch/main/graph/badge.svg)](https://codecov.io/gh/BeckettFrey/RodRoyale-Backend)
+[![CI](https://github.com/BeckettFrey/RodRoyale-backend/actions/workflows/test.yml/badge.svg)](https://github.com/BeckettFrey/RodRoyale-backend/actions/workflows/test.yml)
+
+[![codecov](https://codecov.io/gh/BeckettFrey/RodRoyale-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/BeckettFrey/RodRoyale-backend)
 
 **RodRoyale Backend** is a robust FastAPI backend powering the ultimate social fishing app. Built with async MongoDB integration, it enables anglers to share catches, compete on leaderboards, and connect with the fishing community through an intuitive API.
 
@@ -75,8 +76,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/BeckettFrey/RodRoyale-Backend.git
-cd RodRoyale-Backend
+git clone https://github.com/BeckettFrey/RodRoyale-backend.git
+cd RodRoyale-backend
 
 # Install dependencies
 python -m venv venv
@@ -165,8 +166,8 @@ During staging I would appreciate any feedback or suggestions see CONTRIBUTING.m
 ### Development Setup
 ```bash
 # Clone and install
-git clone https://github.com/BeckettFrey/RodRoyale-Backend.git
-cd RodRoyale-Backend
+git clone https://github.com/BeckettFrey/RodRoyale-backend.git
+cd RodRoyale-backend
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
 

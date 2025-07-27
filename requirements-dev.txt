@@ -1,4 +1,3 @@
 faker
-python==3.11.7
 pytest==8.4.1
 pluggy==1.6.0
