@@ -5,11 +5,7 @@ from fastapi import HTTPException, UploadFile
 from typing import Dict, Optional
 import uuid
 import logging
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from config import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -28,10 +24,10 @@ class CloudinaryService:
             return
             
         # Get configuration from environment variables
-        cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME')
-        api_key = os.getenv('CLOUDINARY_API_KEY') 
-        api_secret = os.getenv('CLOUDINARY_API_SECRET')
-        
+        cloud_name = settings.CLOUDINARY_CLOUD_NAME
+        api_key = settings.CLOUDINARY_API_KEY
+        api_secret = settings.CLOUDINARY_API_SECRET
+
         if not all([cloud_name, api_key, api_secret]):
             raise ValueError(
                 "Cloudinary configuration missing. Please set CLOUDINARY_CLOUD_NAME, "
