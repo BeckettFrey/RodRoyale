@@ -25,9 +25,15 @@ class Settings:
     CLOUDINARY_API_SECRET: str = os.getenv("CLOUDINARY_API_SECRET", "")
 
     # Token Expiration Settings
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)) 
-    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))  
-    
+    access_token_expire_minutes = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
+    if not access_token_expire_minutes.isdigit():
+        access_token_expire_minutes = 30
+
+    refresh_token_expire_days = os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7)
+    if not refresh_token_expire_days.isdigit():
+        refresh_token_expire_days = 7
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(refresh_token_expire_days)
+
     class Config:
         case_sensitive = True
 
