@@ -172,7 +172,7 @@ class TestSocialFeatures:
             weight=7.2,
             shared_with_followers=True
         )
-        catch_id = catch_data["id"]
+        catch_id = catch_data["_id"]
         
         # Step 2: Check feed before following (should not include catch)
         feed_before = client.get("/api/v1/catches/feed", headers=auth_headers)
@@ -192,7 +192,7 @@ class TestSocialFeatures:
         feed_after = client.get("/api/v1/catches/feed", headers=auth_headers)
         assert feed_after.status_code == status.HTTP_200_OK
         
-        after_catch_ids = [catch["id"] for catch in feed_after.json()]
+        after_catch_ids = [catch["_id"] for catch in feed_after.json()]
         assert catch_id in after_catch_ids
         
         # Step 5: Unfollow and verify catch disappears from feed
@@ -225,8 +225,8 @@ class TestAccountDeletionIntegration:
             f"/api/v1/users/{user_id}/follow/{target_user_id}",
             headers=auth_headers
         )
-        assert follow_response.status_code == status.HTTP_200_OK
-        
+        assert follow_response.status_code == status.HTTP_204_NO_CONTENT
+
         # Step 2: Create catch with pin
         catch_data = create_test_catch(
             client, 

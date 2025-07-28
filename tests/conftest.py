@@ -36,8 +36,9 @@ def setup_test_database():
     """Set up test database configuration for the entire test session."""
     # Override the database name to use test database
     import os
-    os.environ["DATABASE_NAME"] = f"{settings.DATABASE_NAME}_test"
-    
+    os.environ["DATABASE_NAME"] = TEST_DATABASE_NAME
+    os.environ["MONGODB_URL"] = TEST_MONGODB_URL
+
     # Force reload settings to pick up the new database name
     import importlib
     import config

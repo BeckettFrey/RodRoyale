@@ -7,7 +7,7 @@ load_dotenv()
 class Settings:
     # MongoDB Configuration
     MONGODB_URL: str = os.getenv("MONGODB_URL", "localhost:27017")
-    DATABASE_NAME: str = os.getenv("DATABASE_NAME", "rod_royale_db")
+    DATABASE_NAME: str = os.getenv("DATABASE_NAME", "rod-royale-db")
     
     # API Configuration
     API_V1_STR: str = os.getenv("API_V1_STR", "/api/v1")
