@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "Rod Royale",
+    "slug": "rod-royale-fishing-battle",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "main": "./App.tsx",
+    "userInterfaceStyle": "light",
+    "platforms": ["ios", "android", "web"],
+    "splash": {
+      "backgroundColor": "#4DB6E8"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rodroyale.fishingbattle",
+      "jsEngine": "hermes",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSExceptionMinimumTLSVersion": "1.0"
+            },
+            "127.0.0.1": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSExceptionMinimumTLSVersion": "1.0"
+            },
+            "192.168.86.29": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSExceptionMinimumTLSVersion": "1.0"
+            }
+          }
+        }
+      }
+    },
+    "android": {
+      "jsEngine": "hermes",
+      "adaptiveIcon": {
+        "backgroundColor": "#4DB6E8"
+      },
+      "package": "com.rodroyale.fishingbattle",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-location",
+      "expo-image-picker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share your fishing catches.",
+          "cameraPermission": "The app accesses your camera to let you take photos of your catches."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Rod Royale to use your location to tag your fishing catches."
+        }
+      ]
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@react-native/typescript-config",
+   "compilerOptions": {
+    // other options
+    "esModuleInterop": true
+  }
+}
