@@ -1,6 +1,6 @@
 # LEARNING_OUTLINE
 
-This document outlines key concepts and nuanced details for learning and contributing to the RodRoyale Backend.
+This document outlines key concepts and nuanced details for learning and contributing to the RodRoyale.
 
 ## Key Concepts
 
@@ -23,4 +23,5 @@ This document outlines key concepts and nuanced details for learning and contrib
 - **Contribution Workflow**: Use black and flake8 for code style. PRs should include tests and docs for new features.
 - **Automated Testing**: Every push and pull request triggers GitHub Actions workflows that run unit and integration tests using Pytest.
 - **Codecov Integration**: Test coverage is tracked with Codecov.
+- **React Native**: The mobile app is built with React Native, allowing for cross-platform development. Familiarity with React concepts and mobile development best practices is essential.
 

@@ -23,4 +23,4 @@ This document provides an overview of the security mechanisms implemented in the
 - TODO
 
 ---
-For production, I ensure all secrets are set and use a secure deployment strategy.
+For production, I'll ensure all secrets are set and use a secure deployment strategy.
