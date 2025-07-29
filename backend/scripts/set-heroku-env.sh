@@ -2,7 +2,7 @@
 
 # Ensure the user provides the Heroku app name
 if [ -z "$1" ]; then
-  echo "Usage: ./set-heroku-env.sh <heroku-app-name>"
+  echo "Usage: ./set-heroku-env.sh <heroku-app-name> [<project-subdirectory>]"
   exit 1
 fi
 
