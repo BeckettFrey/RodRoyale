@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MONGODB_URL=mongodb+srv://beckettfrey:7UcXNAoH3OVo5SjI@src.wa7cu3m.mongodb.net/rodroyale?retryWrites=true&w=majority&appName=src
+      - MONGODB_URL=mongodb://mongodb:27017/RodRoyale_db
       - DATABASE_NAME=rod-royale-db
     depends_on:
       - mongodb

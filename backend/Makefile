@@ -6,3 +6,6 @@ test:
 
 build:
 	docker build -t rod-royale-backend .
+
+deploy: 
+	git subtree push --prefix backend heroku main
