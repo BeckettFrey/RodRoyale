@@ -1,4 +1,4 @@
-name: Run Pytest Suite
+name: API Tests
 
 on:
   push:
@@ -27,15 +27,15 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
+        working-directory: ./backend
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
           pip install pytest-cov codecov
-      - name: Set MongoDB URI
-        run: echo "MONGODB_URI=mongodb://localhost:27017/testdb" >> $GITHUB_ENV
       - name: Run tests with coverage
+        working-directory: ./backend
         run: |
           source venv/bin/activate
           pytest --cov=. --cov-report=xml --disable-warnings --tb=short
