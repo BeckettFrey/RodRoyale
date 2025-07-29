@@ -7,9 +7,11 @@ __pycache__/
 *.so
 
 # Environment variables
-.env
-.env.local
-.env.production
+.env*
+!.env.example
+
+# OSX
+.DS_Store
 
 # Virtual environment
 venv/
