@@ -8,6 +8,7 @@ interface MapComponentProps {
     longitude: number;
     latitudeDelta: number;
     longitudeDelta: number;
+    onRegionChangeComplete: (region: any) => void; // new
   };
   pins: Pin[];
   onMarkerPress: (pin: Pin) => void;
@@ -19,6 +20,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   pins,
   onMarkerPress,
   getMarkerColor,
+  onRegionChangeComplete, // new
 }) => {
   const [MapModule, setMapModule] = useState<any>(null);
 
@@ -99,8 +101,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
       provider={PROVIDER_GOOGLE}
       style={styles.map}
       region={currentLocation}
-      onRegionChange={(region: any) => {
+      onRegionChangeComplete={(region: any) => {
         console.log('🗺️ [MAP COMPONENT] Region changed:', region);
+        onRegionChangeComplete(region);
       }}
       showsUserLocation={true}
       showsMyLocationButton={false}

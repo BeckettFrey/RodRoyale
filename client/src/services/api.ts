@@ -452,7 +452,7 @@ class ApiService {
             requestConfig.httpsAgent = false;
           }
           
-          console.log('🌐 [CREATE CATCH] Making request to:', `${baseUrl}/catches`);
+          console.log('🌐 [CREATE CATCH] Making request to:', `${baseUrl}/catches/`);
           console.log('🔍 [CREATE CATCH] Full request details:', {
             url: `${baseUrl}/catches`,
             method: 'POST',
@@ -462,7 +462,7 @@ class ApiService {
           
           console.log('📋 [CREATE CATCH] Request config:', JSON.stringify(requestConfig, null, 2));
           
-          const response = await axios.post(`${baseUrl}/catches`, catchData, requestConfig);
+          const response = await axios.post(`${baseUrl}/catches/`, catchData, requestConfig);
           console.log('✅ [CREATE CATCH] Success response:', response.data);
           return response.data;
           
@@ -882,9 +882,9 @@ class ApiService {
   // Pin Management
   async createPin(pinData: CreatePinRequest): Promise<Pin> {
     console.log('🔧 [API] createPin called with data:', pinData);
-    console.log('🔧 [API] createPin URL:', `${this.baseURL}/pins`);
+    console.log('🔧 [API] createPin URL:', `${this.baseURL}/pins/`);
     
-    const response = await axios.post(`${this.baseURL}/pins`, pinData);
+    const response = await axios.post(`${this.baseURL}/pins/`, pinData);
     console.log('🔧 [API] createPin response status:', response.status);
     console.log('🔧 [API] createPin response data:', response.data);
     
@@ -899,9 +899,9 @@ class ApiService {
     if (radius !== undefined) params.radius = radius;
     
     console.log('🔧 [API] getPins called with params:', params);
-    console.log('🔧 [API] getPins URL:', `${this.baseURL}/pins`);
+    console.log('🔧 [API] getPins URL:', `${this.baseURL}/pins/`);
     
-    const response = await axios.get(`${this.baseURL}/pins`, { params });
+    const response = await axios.get(`${this.baseURL}/pins/`, { params });
     console.log('🔧 [API] getPins response status:', response.status);
     console.log('🔧 [API] getPins response data length:', response.data?.length || 0);
     console.log('🔧 [API] getPins response data preview:', response.data?.slice(0, 2) || []);

@@ -27,6 +27,18 @@ const MapScreen: React.FC<MapScreenProps> = () => {
   });
   const { user } = useAuth();
 
+  const handleRegionChangeComplete = async (region: any) => {
+    console.log("🔄 Region moved to:", region);
+
+    const radius = Math.max(
+      region.latitudeDelta * 111, // rough km conversion
+      region.longitudeDelta * 111 * Math.cos(region.latitude * Math.PI / 180)
+    );
+
+    console.log("🔄 Fetching pins within radius:", radius);
+    await loadPins(region.latitude, region.longitude, radius);
+  };
+
   // Calculate deltas based on pins spread
   const calculateMapRegion = (pins: Pin[], userLocation?: { latitude: number; longitude: number }) => {
     if (pins.length === 0) {
@@ -83,15 +95,11 @@ const MapScreen: React.FC<MapScreenProps> = () => {
       const mapPins = await ApiService.getPins(centerLat, centerLng, radius);
       console.log('🗺️ [MAP] Raw API response:', mapPins);
       console.log('🗺️ [MAP] Loaded pins count:', mapPins.length);
+      console.log("🛠️ Raw pin objects:", JSON.stringify(mapPins, null, 2));
       
       // Enhanced validation with detailed logging
       const validPins = mapPins.filter((pin, index) => {
         console.log(`🗺️ [MAP] Validating pin ${index}:`, pin);
-        
-        if (!pin.id) {
-          console.warn(`🗺️ [MAP] Pin ${index} missing id:`, pin);
-          return false;
-        }
         
         if (typeof pin.location.lat !== 'number' || isNaN(pin.location.lat)) {
           console.warn(`🗺️ [MAP] Pin ${index} invalid latitude:`, pin.location.lat);
@@ -279,7 +287,10 @@ const MapScreen: React.FC<MapScreenProps> = () => {
         pins={pins}
         onMarkerPress={handleMarkerPress}
         getMarkerColor={getMarkerColor}
+        onRegionChangeComplete={handleRegionChangeComplete}
       />
+
+
 
       {pins.length === 0 && (
         <View style={styles.noPinsContainer}>
