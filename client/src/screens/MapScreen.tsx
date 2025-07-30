@@ -9,19 +9,14 @@ import {
 import LoadingSpinner from '../components/LoadingSpinner';
 import * as Location from 'expo-location';
 import { useAuth } from '../contexts/AuthContext';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { useFocusEffect } from '@react-navigation/native';
 import ApiService from '../services/api';
 import { Pin } from '../types/api';
 import MapComponent from '../components/MapComponent';
 
-type MapScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Map'>;
-
 interface MapScreenProps {}
 
 const MapScreen: React.FC<MapScreenProps> = () => {
-  const navigation = useNavigation<MapScreenNavigationProp>();
   const [pins, setPins] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentLocation, setCurrentLocation] = useState({
@@ -95,11 +90,6 @@ const MapScreen: React.FC<MapScreenProps> = () => {
         
         if (!pin.id) {
           console.warn(`🗺️ [MAP] Pin ${index} missing id:`, pin);
-          return false;
-        }
-        
-        if (!pin.location) {
-          console.warn(`🗺️ [MAP] Pin ${index} missing location:`, pin);
           return false;
         }
         

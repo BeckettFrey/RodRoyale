@@ -28,6 +28,7 @@ interface AuthResponse {
 
 class ApiService {
   private baseURL: string;
+  private onUnauthorized?: () => Promise<void>;
 
   constructor() {
     this.baseURL = Config.API_BASE_URL;
@@ -35,6 +36,10 @@ class ApiService {
     console.log('🔧 [API SERVICE] Platform:', Platform.OS);
     this.setupInterceptors();
     this.setupDefaultTimeout();
+  }
+
+  setUnauthorizedHandler(handler: () => Promise<void>) {
+    this.onUnauthorized = handler;
   }
 
   // Setup default timeout for all requests
@@ -68,10 +73,10 @@ class ApiService {
         if (token && isApiRequest) {
           config.headers.Authorization = `Bearer ${token}`;
           console.log(`✅ Adding auth token to request: ${config.url}`);
-          console.log(`🔑 Token preview: ${token.substring(0, 20)}...`);
         } else if (isApiRequest) {
           console.log(`❌ No token found for API request: ${config.url}`);
         }
+
         return config;
       },
       (error) => {
@@ -83,10 +88,12 @@ class ApiService {
     axios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 || error.response?.status === 500 || error.response?.status === 403) {
           // Token expired or invalid
           await this.clearToken();
-          // Could trigger logout here if needed
+          if (this.onUnauthorized) {
+            await this.onUnauthorized(); 
+          }
         }
         return Promise.reject(error);
       }
@@ -139,10 +146,6 @@ class ApiService {
   async register(userData: RegisterRequest): Promise<AuthResponse> {
     const response = await axios.post(`${this.baseURL}/auth/register`, userData);
     const authData = response.data;
-    console.log('Register response:', { 
-      token_preview: authData.token?.access_token?.substring(0, 20) + '...', 
-      user: authData.user 
-    });
     await this.setToken(authData.token.access_token);
     console.log('Token stored successfully');
     return authData;

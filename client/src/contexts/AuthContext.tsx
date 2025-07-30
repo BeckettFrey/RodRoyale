@@ -27,6 +27,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     loadStoredUser();
+    // inject logout into ApiService when provider mounts
+    ApiService.setUnauthorizedHandler(async () => {
+      await logout();
+      console.log('AuthContext (onUnauthorized): User logged out due to unauthorized access');
+    });
   }, []);
 
   const loadStoredUser = async () => {
@@ -168,3 +173,4 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
