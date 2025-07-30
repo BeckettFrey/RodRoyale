@@ -1,3 +1,4 @@
+## 🎬 **[WATCH THE DEMO VIDEO](https://youtu.be/6ZqDfPWTeqM)** 🎬
 # 🎣 Rod Royale
 [![CI](https://github.com/BeckettFrey/RodRoyale/actions/workflows/api.yml/badge.svg)](https://github.com/BeckettFrey/RodRoyale/actions/workflows/api.yml)
 
@@ -6,10 +7,6 @@
 **Rod Royale** is the ultimate social fishing application that connects anglers worldwide. Share your greatest catches, discover fishing hotspots on interactive maps, compete on leaderboards, and build a community with fellow fishing enthusiasts.
 
 This repository contains both the **FastAPI backend** and **React Native mobile app** in a unified codebase.
-
-## 🎬 **[WATCH THE DEMO VIDEO](https://youtu.be/6ZqDfPWTeqM)** 🎬
-
-[![Watch Demo](https://img.shields.io/badge/📺_DEMO_VIDEO-FF0000?style=for-the-badge&logo=youtube&logoColor=white&labelColor=000000)](https://youtu.be/6ZqDfPWTeqM)
 
 > ✅ **Stage-Ready**: Both API and mobile app are stable and ready for staging.
 
